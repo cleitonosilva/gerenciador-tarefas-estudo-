@@ -56,8 +56,8 @@ export class TodoComponent implements OnInit {
     const initialTodos: Todo[] = [
       {
         id: this.generateUniqueId(),
-        title: 'Estudar Angular 19',
-        description: 'Aprender as novas features como Signals e Control Flow',
+        title: 'Chamar endpoint atualizado?',
+        description: 'Neque porro quisquam est qui dolorem ipsum quia dolor sit amet, consectetur, adipisci velit..',
         completed: false,
         priority: 'high',
         source: 'manual',
@@ -66,8 +66,8 @@ export class TodoComponent implements OnInit {
       },
       {
         id: this.generateUniqueId(),
-        title: 'Implementar NgRx',
-        description: 'Configurar store, actions, reducers e effects',
+        title: 'Implementar Generics components',
+        description: 'Neque porro quisquam est qui dolorem ipsum quia dolor sit amet, consectetur, adipisci velit..',
         completed: true,
         priority: 'medium',
         source: 'manual',
@@ -77,7 +77,7 @@ export class TodoComponent implements OnInit {
       {
         id: this.generateUniqueId(),
         title: 'Criar componentes standalone',
-        description: 'Desenvolver componentes independentes sem NgModules',
+        description: 'Neque porro quisquam est qui dolorem ipsum quia dolor sit amet, consectetur, adipisci velit..',
         completed: false,
         priority: 'low',
         source: 'manual',
