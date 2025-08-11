@@ -1,0 +1,142 @@
+<div class="todo-container animate-fade-in">
+  <header class="todo-header">
+    <h1>Gerenciador de Tarefas</h1>
+    <p class="subtitle">Features Angular 19</p>
+  </header>
+
+  <div class="stats-container">
+    <div class="stat-card">
+      <span class="stat-number">{{ todosCount() }}</span>
+      <span class="stat-label">Total</span>
+    </div>
+    <div class="stat-card">
+      <span class="stat-number">{{ activeTodosCount() }}</span>
+      <span class="stat-label">Ativas</span>
+    </div>
+    <div class="stat-card">
+      <span class="stat-number">{{ completedTodosCount() }}</span>
+      <span class="stat-label">Concluídas</span>
+    </div>
+  </div>
+
+  <app-todo-form
+    (addTodo)="onAddTodo($event)"
+    (cancel)="onCancelAdd()"
+  />
+
+  <app-import-posts
+    #importPostsComponent
+    (importTodo)="onImportPosts($event)"
+    (postRemoved)="onPostRemoved($event)"
+  />
+
+  <div class="filters-container">
+    <div class="filter-group">
+      <label for="filter">Filtrar:</label>
+      <select
+        id="filter"
+        [value]="currentFilter()"
+        (change)="onFilterChange($event)"
+        class="filter-select"
+      >
+        <option value="all">Todas</option>
+        <option value="active">Ativas</option>
+        <option value="completed">Concluídas</option>
+      </select>
+    </div>
+
+    <div class="search-group">
+      <label for="search">Buscar:</label>
+      <input
+        type="text"
+        id="search"
+        [value]="currentSearchTerm()"
+        (input)="onSearchChange($event)"
+        placeholder="Buscar por título ou descrição..."
+        class="search-input"
+      />
+    </div>
+  </div>
+
+  @if (loading()) {
+    <app-loading-spinner message="Carregando tarefas..." />
+  }
+
+  @if (error()) {
+    <div class="error-message">
+      <p>Erro: {{ error() }}</p>
+      <button (click)="loadTodos()" class="btn btn-error">
+        Tentar novamente
+      </button>
+    </div>
+  }
+
+  @if (!loading() && !error()) {
+    @if (filteredTodos().length === 0) {
+      <div
+        class="empty-state drop-zone"
+        (dragover)="onDragOver($event)"
+        (dragleave)="onDragLeave($event)"
+        (drop)="onDrop($event)"
+        [class.drag-over]="isDragOver()"
+      >
+        <p>Nenhuma tarefa encontrada</p>
+        <p class="empty-hint">
+          @if (currentSearchTerm()) {
+            Tente ajustar sua busca ou filtro
+          } @else {
+            Adicione sua primeira tarefa!
+          }
+        </p>
+        <p class="drop-hint">Arraste posts da API aqui para criar tarefas</p>
+      </div>
+    } @else {
+      <div
+        class="todos-list drop-zone"
+        (dragover)="onDragOver($event)"
+        (dragleave)="onDragLeave($event)"
+        (drop)="onDrop($event)"
+        [class.drag-over]="isDragOver()"
+      >
+        @for (todo of filteredTodos(); track todo.id) {
+          <app-todo-item
+            [todo]="todo"
+            (toggleComplete)="onToggleComplete($event)"
+            (edit)="onEditTodo($event)"
+            (delete)="onDeleteTodo($event)"
+          />
+        }
+      </div>
+    }
+  }
+
+  @if (todosCount() > 0 && !loading()) {
+    <div class="batch-actions">
+      <button
+        (click)="onClearCompleted()"
+        [disabled]="completedTodosCount() === 0"
+        class="btn btn-secondary"
+      >
+        Limpar Concluídas ({{ completedTodosCount() }})
+      </button>
+    </div>
+  }
+
+  <app-confirm-modal
+    [show]="showDeleteModal()"
+    title="Confirmar Exclusão"
+    message="Tem certeza que deseja excluir a tarefa '{{ todoToDelete()?.title }}'? Esta ação não pode ser desfeita."
+    confirmText="Excluir"
+    cancelText="Cancelar"
+    type="danger"
+    (confirm)="confirmDelete()"
+    (cancel)="closeDeleteModal()"
+  />
+
+  <app-edit-modal
+    [show]="showEditModal()"
+    [todo]="todoToEdit()"
+    (save)="onSaveEdit($event)"
+    (cancel)="closeEditModal()"
+  />
+</div>

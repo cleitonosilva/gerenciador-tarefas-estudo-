@@ -1,0 +1,175 @@
+<div class="import-posts-container">
+  <div class="import-header">
+    <h3>Importar Posts da API</h3>
+    <p class="import-description">
+      Busque posts da JSONPlaceholder API e converta-os em tarefas
+    </p>
+    <p class="drag-hint">
+      <strong>Dica:</strong> Arraste qualquer post diretamente para a lista de tarefas para criar uma nova tarefa!
+    </p>
+  </div>
+
+  <div class="import-actions">
+    <button
+      class="btn btn-primary"
+      (click)="loadPosts(1)"
+      [disabled]="loading()"
+    >
+      @if (loading()) {
+        <span class="loading-btn">
+          <svg class="spinner-icon" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+            <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+            <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+          </svg>
+          Carregando...
+        </span>
+      } @else {
+        <span>Buscar Posts da API</span>
+      }
+    </button>
+
+    @if (posts().length > 0) {
+      <div class="selection-actions">
+        <button class="btn btn-secondary" (click)="selectAll()">
+          Selecionar Todos
+        </button>
+        <button class="btn btn-secondary" (click)="deselectAll()">
+          Desmarcar Todos
+        </button>
+                  <button
+            class="btn btn-success"
+            (click)="importSelectedPosts()"
+            [disabled]="getSelectedCount() === 0"
+          >
+            <svg class="btn-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M9 19l3 3m0 0l3-3m-3 3V10"></path>
+            </svg>
+            Importar {{ getSelectedCount() }} Post(s)
+          </button>
+      </div>
+    }
+  </div>
+
+  @if (error()) {
+    <div class="error-message">
+      <p>
+        <svg class="error-icon" fill="currentColor" viewBox="0 0 20 20">
+          <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd"></path>
+        </svg>
+        {{ error() }}
+      </p>
+      <button class="btn btn-error" (click)="loadPosts(1)">
+        Tentar novamente
+      </button>
+    </div>
+  }
+
+  @if (posts().length > 0) {
+    <div class="posts-list">
+      <div class="posts-header">
+        <h4>Posts Disponíveis ({{ totalPosts() }} total)</h4>
+        <div class="posts-info">
+          Página {{ currentPage() }} de {{ getTotalPages() }}
+          ({{ postsPerPage() }} por página)
+        </div>
+      </div>
+
+      @for (post of posts(); track post.id) {
+        <div
+          class="post-item"
+          [class.selected]="selectedPosts().includes(post.id)"
+          draggable="true"
+          [attr.data-post-id]="post.id"
+          (dragstart)="onDragStart($event, post)"
+          (dragend)="onDragEnd($event)"
+        >
+          <div class="post-header">
+            <div class="post-selection">
+              <input
+                type="checkbox"
+                [checked]="selectedPosts().includes(post.id)"
+                (change)="togglePostSelection(post.id)"
+                class="post-checkbox"
+              />
+            </div>
+            <div class="post-content">
+              <h5 class="post-title">{{ post.title }}</h5>
+              <p class="post-body">{{ post.body.substring(0, 150) }}{{ post.body.length > 150 ? '...' : '' }}</p>
+              <div class="post-meta">
+                <span class="post-id">ID: {{ post.id }}</span>
+                <span class="post-user">User ID: {{ post.userId }}</span>
+              </div>
+            </div>
+            <div class="post-priority">
+              <label class="priority-label">Prioridade:</label>
+              <div class="priority-badges">
+                <div
+                  class="priority-badge-container"
+                  [class.active]="post.priority === 'low'"
+                  [class.disabled]="!selectedPosts().includes(post.id)"
+                  (click)="updatePostPriority(post.id, 'low')"
+                  [class.clickable]="selectedPosts().includes(post.id)"
+                  title="Definir prioridade baixa"
+                >
+                  <app-priority-badge priority="low" />
+                </div>
+                <div
+                  class="priority-badge-container"
+                  [class.active]="post.priority === 'medium'"
+                  [class.disabled]="!selectedPosts().includes(post.id)"
+                  (click)="updatePostPriority(post.id, 'medium')"
+                  [class.clickable]="selectedPosts().includes(post.id)"
+                  title="Definir prioridade média"
+                >
+                  <app-priority-badge priority="medium" />
+                </div>
+                <div
+                  class="priority-badge-container"
+                  [class.active]="post.priority === 'high'"
+                  [class.disabled]="!selectedPosts().includes(post.id)"
+                  (click)="updatePostPriority(post.id, 'high')"
+                  [class.clickable]="selectedPosts().includes(post.id)"
+                  title="Definir prioridade alta"
+                >
+                  <app-priority-badge priority="high" />
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      }
+
+      @if (getTotalPages() > 1) {
+        <div class="pagination">
+          <button
+            class="btn btn-secondary pagination-btn"
+            (click)="previousPage()"
+            [disabled]="!canGoPrevious()"
+          >
+            ← Anterior
+          </button>
+
+          <div class="page-numbers">
+            @for (page of getPageNumbers(); track page) {
+              <button
+                class="page-btn"
+                [class.active]="page === currentPage()"
+                (click)="goToPage(page)"
+              >
+                {{ page }}
+              </button>
+            }
+          </div>
+
+          <button
+            class="btn btn-secondary pagination-btn"
+            (click)="nextPage()"
+            [disabled]="!canGoNext()"
+          >
+            Próxima →
+          </button>
+        </div>
+      }
+    </div>
+  }
+</div>

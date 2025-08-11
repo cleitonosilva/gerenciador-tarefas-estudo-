@@ -1,0 +1,96 @@
+@if (show()) {
+  <div class="modal-backdrop" (click)="onBackdropClick($event)">
+    <div class="modal-container animate-slide-up">
+      <div class="modal-header">
+        <h3 class="modal-title">Editar Tarefa</h3>
+        <button class="close-button" (click)="onCancel()" title="Fechar">
+          <svg class="icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+          </svg>
+        </button>
+      </div>
+
+      <div class="modal-body">
+        <form (ngSubmit)="onSubmit()" #editForm="ngForm">
+          <div class="form-group">
+            <label for="edit-title">Título *</label>
+            <input
+              type="text"
+              id="edit-title"
+              name="title"
+              [ngModel]="formData().title"
+              (ngModelChange)="updateTitle($event)"
+              required
+              class="form-control"
+              placeholder="Digite o título da tarefa"
+            />
+          </div>
+
+          <div class="form-group">
+            <label for="edit-description">Descrição</label>
+            <textarea
+              id="edit-description"
+              name="description"
+              [ngModel]="formData().description"
+              (ngModelChange)="updateDescription($event)"
+              class="form-control"
+              rows="3"
+              placeholder="Digite uma descrição (opcional)"
+            ></textarea>
+          </div>
+
+          <div class="form-group">
+            <label for="edit-priority">Prioridade</label>
+            <select
+              id="edit-priority"
+              name="priority"
+              [ngModel]="formData().priority"
+              (ngModelChange)="updatePriority($event)"
+              class="form-control"
+            >
+              <option value="low">Baixa</option>
+              <option value="medium">Média</option>
+              <option value="high">Alta</option>
+            </select>
+          </div>
+
+          <div class="form-group checkbox-group">
+            <label class="checkbox-label">
+              <input
+                type="checkbox"
+                name="completed"
+                [ngModel]="formData().completed"
+                (ngModelChange)="updateCompleted($event)"
+                class="checkbox-input"
+              />
+              <span class="checkbox-text">Marcar como concluída</span>
+            </label>
+          </div>
+        </form>
+      </div>
+
+      <div class="modal-footer">
+        <button class="btn btn-secondary" (click)="onCancel()" [disabled]="isSubmitting()">
+          Cancelar
+        </button>
+        <button
+          class="btn btn-primary"
+          (click)="onSubmit()"
+          [disabled]="!editForm.valid || isSubmitting()"
+        >
+          @if (isSubmitting()) {
+            <span class="loading-btn">
+              <svg class="spinner-icon" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+              </svg>
+              Salvando...
+            </span>
+          } @else {
+            <span>Salvar Alterações</span>
+          }
+        </button>
+      </div>
+    </div>
+  </div>
+}

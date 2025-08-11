@@ -1,0 +1,66 @@
+<div class="todo-item animate-slide-up" [class.completed]="todo().completed" [class.api-source]="todo().source === 'api'">
+  <div class="todo-content">
+    <div class="todo-header">
+      <div class="todo-title-section">
+        <input
+          type="checkbox"
+          [checked]="todo().completed"
+          (change)="onToggleComplete()"
+          class="todo-checkbox"
+        />
+        <div class="title-container">
+          <h4 class="todo-title">{{ todo().title }}</h4>
+        </div>
+      </div>
+
+      <div class="todo-actions">
+        <app-priority-badge [priority]="todo().priority" />
+        <button
+          class="btn-icon btn-edit"
+          [class.disabled]="todo().completed"
+          (click)="onEdit()"
+          [disabled]="todo().completed"
+          [title]="todo().completed ? 'Não é possível editar tarefas concluídas' : 'Editar'"
+        >
+          <svg class="icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path>
+          </svg>
+        </button>
+        <button
+          class="btn-icon btn-delete"
+          (click)="onDelete()"
+          title="Excluir"
+        >
+          <svg class="icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
+          </svg>
+        </button>
+      </div>
+    </div>
+
+    @if (todo().description) {
+      <p class="todo-description">{{ todo().description }}</p>
+    }
+
+    <div class="todo-meta">
+      <div class="todo-dates">
+        <span class="todo-date">
+          Criado em: {{ todo().createdAt | date:'dd/MM/yyyy HH:mm' }}
+        </span>
+        @if (todo().updatedAt !== todo().createdAt) {
+          <span class="todo-date">
+            Atualizado em: {{ todo().updatedAt | date:'dd/MM/yyyy HH:mm' }}
+          </span>
+        }
+      </div>
+      @if (todo().source === 'api') {
+        <div class="api-badge" title="Tarefa adicionada pela API">
+          <svg class="api-icon" fill="currentColor" viewBox="0 0 20 20">
+            <path fill-rule="evenodd" d="M3 4a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm0 4a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm0 4a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm0 4a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1z" clip-rule="evenodd"></path>
+          </svg>
+          API
+        </div>
+      }
+    </div>
+  </div>
+</div>
